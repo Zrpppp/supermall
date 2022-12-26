@@ -15,7 +15,7 @@
       <goods-list :goods="recommends" ref="recommend"/>
     </scroll>
     <back-top @click.native="backClick" v-show="isShow"></back-top>
-    <detail-bottom-bar></detail-bottom-bar>
+    <detail-bottom-bar @addCart="addToCart"></detail-bottom-bar>
   </div>
 </template>
 
@@ -34,7 +34,7 @@ import {itemListenerMixin, backTopMixin} from "common/mixin";
 import Scroll from "components/common/scroll/Scroll";
 import GoodsList from "components/content/goods/GoodsList";
 import {debounce} from "@/common/utils";
-
+import {mapActions} from 'vuex'
 
 export default {
   name: "Detail",
@@ -113,6 +113,7 @@ export default {
     }, 100)
   },
   methods: {
+    ...mapActions(['addCart']),
     imageLoad() {
       this.$refs.scroll.refresh()
       this.getThemeTopY()
@@ -134,6 +135,25 @@ export default {
     },
     titleClick(index) {
       this.$refs.scroll.scrollTo(0, -this.themeTopYs[index], 340)
+    },
+    addToCart() {
+      // console.log('-------')
+      //1.获取购物车需要展示的信息
+      const product = {}
+      product.image = this.topImages[0];
+      product.title = this.goods.title;
+      product.desc = this.goods.desc;
+      product.price = this.goods.realPrice;
+      product.iid = this.iid;
+
+      //2.将商品添加到购物车里
+      // this.$store.commit('addCart',product)
+      // this.$store.dispatch('addCart', product).then(res => {
+      //   console.log(res);
+      // })
+      this.addCart(product).then(res => {
+        this.$toast.show(res,2000)
+      })
     },
   }
 }
